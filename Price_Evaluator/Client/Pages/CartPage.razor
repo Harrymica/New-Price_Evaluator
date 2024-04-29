@@ -1,0 +1,130 @@
+﻿@page "/cart"
+@using Newtonsoft.Json
+@using Price_Evaluator.Shared
+@inject HttpClient http
+@inject ILocalStorageService _lStorage
+<style>
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'DM Sans', sans-serif;
+        --font-sans: 'DM Sans';
+    }
+</style>
+<style>
+    body {
+        font-family: 'Rethink Sans', sans-serif;
+        --font-sans: 'Rethink Sans';
+    }
+</style>
+<div class="flex flex-col h-full">
+    
+    <div class="flex-1 overflow-auto p-6">
+        <div class="border rounded-lg overflow-hidden">
+            <div class="bg-gray-100 dark:bg-gray-800 px-4 py-3 flex items-center justify-between">
+                <h2 class="text-lg font-semibold">Your Cart</h2>
+                <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
+                    Clear Cart
+                </button>
+            </div>
+            <div class="relative w-full overflow-auto">
+                <table class="w-full caption-bottom text-sm">
+                    <thead class="[&amp;_tr]:border-b">
+                        <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                            <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
+                                Product
+                            </th>
+                            <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
+                                Price
+                            </th>
+                           
+                            <th class="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="[&amp;_tr:last-child]:border-0">
+                        @if(cartList == null)
+                        {
+                            
+                        }
+                        else
+                        {
+                            foreach (var item in cartList)
+                            {
+                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
+                                        <div class="flex items-center gap-4">
+                                            <img src="@item.ImageUrl"
+                                                 alt="Product Image"
+                                                 width="64"
+                                                 height="64"
+                                                 class="rounded-md"
+                                                 style="aspect-ratio: 64 / 64; object-fit: cover;" />
+                                            <div>
+                                                <h3 class="font-medium">Wireless Headphones</h3>
+                                                <p class="text-sm text-gray-500 dark:text-gray-400">Black, Over-Ear</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">@item.Price</td>
+                                    
+                        
+                                    <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 text-right">
+                                        <button 
+                                            @onclick="() => Delete(item)"
+                                            class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 width="24"
+                                                 height="24"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="currentColor"
+                                                 stroke-width="2"
+                                                 stroke-linecap="round"
+                                                 stroke-linejoin="round"
+                                                 class="w-4 h-4">
+                                                <path d="M3 6h18"></path>
+                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+@code {
+    public List<Cart> cartList = new List<Cart>();
+    protected override async Task OnInitializedAsync()
+    {
+        var cart = await _lStorage.GetItemAsync<List<Cart>>("cart");
+
+        cartList = cart;
+
+    }
+    private async Task Delete(Cart item)
+    {
+        var cart = await _lStorage.GetItemAsync<List<Cart>>("cart");
+        if (cart == null)
+        {
+            return;
+        }
+        var cartItem = cart.Find(x => x.Id == item.Id);
+        cart.Remove(cartItem);
+        await _lStorage.SetItemAsync("cart", cart);
+       
+        
+
+        cartList = cart;
+    }
+
+}

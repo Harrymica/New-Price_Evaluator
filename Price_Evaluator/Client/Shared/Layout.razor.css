@@ -1,0 +1,243 @@
+﻿* {
+    list-style: none;
+    text-decoration: none;
+}
+
+.top-nav {
+    display: flex;
+    top: 0;
+    height: 30px;
+    width: 100%;
+    position: fixed;
+    background-color: #b1aeb2ca;
+    z-index: 2;
+}
+
+.logo {
+    float: left;
+    margin-right: auto;
+    margin-left: 80px;
+    font-size: 30px;
+    color: white;
+    align-self: center;
+}
+
+.right {
+    margin-top: 8px;
+    float: right;
+    margin-right: 20px;
+    color: white;
+    align-self: center;
+}
+
+    .right li {
+        display: inline-block;
+        line-height: 50px;
+        margin: 0 15px;
+        align-self: center;
+        margin-right: 20px;
+        padding: 0px 10px 0px 0px;
+    }
+
+        .right li a {
+            color: white;
+        }
+
+
+
+.checkbtn {
+    font-size: 30px;
+    color: white;
+    float: right;
+    line-height: 50px;
+    margin-right: 40px;
+    cursor: pointer;
+    display: none;
+}
+
+#check {
+    display: none;
+}
+
+
+@media (max-width: 800px) {
+
+
+
+    .logo {
+        margin-left: 10px;
+        font-size: 20px;
+    }
+
+    .checkbtn {
+        display: block;
+        align-self: center;
+        margin-right: 10px;
+    }
+
+    ul {
+        position: fixed;
+        width: 82%;
+        height: 100vh;
+        background: #b1aeb2ca;
+        top: 60px;
+        left: -100%;
+        text-align: center;
+        transition: all .5s;
+    }
+
+    .right ul li {
+        display: block;
+        margin: 50px 0;
+        line-height: 30px;
+        font-size:large;
+    }
+
+    #check:checked ~ ul {
+        left: 0;
+    }
+}
+
+/* Footer goes here*/
+footer {
+    width: 100%;
+    background-color: rgb(196, 221, 243);
+    color: var(--lite);
+    position: relative;
+   /* top:200px;*/
+    margin: 100% 0 0 0;
+    background-image: url("https://i.postimg.cc/R0FXBD2V/icon-2.png");
+    background-repeat: no-repeat;
+    background-position: top right;
+}
+
+.top_header {
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+    .top_header section {
+        width: 50%;
+        text-align: Center;
+    }
+
+    .top_header img {
+        display: block;
+        margin: auto;
+    }
+
+    .top_header .title {
+        line-height: 0;
+    }
+
+    .top_header fieldset {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+    }
+
+        .top_header fieldset input {
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 1rem;
+            border: 0;
+            outline: none;
+            width: 100%;
+        }
+
+        .top_header fieldset .btn2 {
+            background-color: var(--pink);
+            color: var(--lite);
+            padding: 1rem;
+            border: 0;
+            outline: none;
+            width: 150px;
+            transition: 0.5s;
+        }
+
+            .top_header fieldset .btn2:hover {
+                color: var(--white);
+                background-color: #ad5d5a;
+            }
+
+.border-shape {
+    background: rgba(1, 1, 1, 0.5) none repeat scroll 0 0;
+    color: #fff;
+    display: block;
+    height: 3px;
+    left: 0;
+    margin: 20px auto;
+    position: relative;
+    right: 0;
+    text-align: center;
+    top: 0;
+    width: 80px;
+}
+
+    .border-shape::before {
+        background: rgba(1, 1, 1, 0.3) none repeat scroll 0 0;
+        bottom: 0;
+        content: "";
+        height: 1px;
+        left: 80px;
+        margin: 0 auto;
+        position: absolute;
+        text-align: center;
+        top: 1px;
+        width: 100px;
+    }
+
+    .border-shape::after {
+        background: rgba(1, 1, 1, 0.3) none repeat scroll 0 0;
+        bottom: 0;
+        content: "";
+        height: 1px;
+        margin: 0 auto;
+        position: absolute;
+        right: 80px;
+        text-align: center;
+        top: 1px;
+        width: 100px;
+    }
+
+footer .border-shape {
+    width: 40%;
+}
+
+    footer .border-shape::before {
+        width: 100%;
+        left: 120px;
+    }
+
+    footer .border-shape::after {
+        width: 100%;
+        right: 120px;
+    }
+
+footer .bottom_content section {
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: Center;
+}
+
+.bottom_content a {
+    margin: 0 20px;
+    color: ar(--lite);
+    transition: 0.5s;
+}
+
+    .bottom_content a:hover {
+        color: var(--black);
+    }
+
+.copyright {
+    padding: 0.8em 0;
+    background-color: var(--pink);
+    text-align: center;
+    color: rgba(1, 1, 1, 0.7);
+    font-size: 12px;
+}

@@ -1,0 +1,386 @@
+﻿@page "/viewusers"
+@using Newtonsoft.Json
+@using Price_Evaluator.Shared
+@inject HttpClient Http
+@inject ILocalStorageService lStorage
+@inject AuthenticationStateProvider Authprov
+@inject NavigationManager navMag
+
+<!--
+// v0 by Vercel.
+// https://v0.dev/t/tukw1RlizmF
+-->
+
+    <style>h1, h2, h3, h4, h5, h6 { font-family: 'Rubik', sans-serif; --font-sans: 'Rubik'; }
+</style>
+<style>body { font-family: 'Chivo', sans-serif; --font-sans: 'Chivo'; }
+</style>
+<div class="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
+    <header class="bg-white shadow-sm dark:bg-gray-900">
+        <div class="container mx-auto px-4 py-4 md:py-6 flex items-center justify-between">
+            <a class="flex items-center gap-2" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="24"
+                     height="24"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     class="h-6 w-6 text-primary">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <span class="text-lg font-semibold dark:text-dark">Product Evaluator</span>
+            </a>
+           
+
+
+           
+            <nav aria-label="Main"
+                 data-orientation="horizontal"
+                 dir="ltr"
+                 class="relative z-10 flex max-w-max flex-1 items-center justify-center">
+                <div style="position: relative; padding:0 50px 0 0;">
+                    <ul data-orientation="horizontal"
+                        class="group flex flex-1 list-none items-center justify-center space-x-1"
+                        dir="ltr">
+                        <li>
+                            <a href="#" data-radix-collection-item="">
+                                Home
+                            </a>
+                        </li> |
+                        <AuthorizeView>
+                            <NotAuthorized>
+
+                                <li>
+                                    <a href="/login" data-radix-collection-item="">
+                                        Login
+                                    </a>
+                                </li> |
+                                <li>
+                                    <a href="registerpage" data-radix-collection-item="">
+                                        Register
+                                    </a>
+                                </li> |
+
+                            </NotAuthorized>
+                            <Authorized>
+                                <li>
+                                    <a href="#" data-radix-collection-item="">
+                                        @email
+                                    </a>
+                                </li> |
+                               
+                            </Authorized>
+
+                        </AuthorizeView>
+                        <AuthorizeView Policy="Role">
+                            <NotAuthorized>
+                                <li>
+                                    <a href="/adminlogin" data-radix-collection-item="">
+                                        Admin Login
+                                    </a>
+                                </li> | 
+                            </NotAuthorized>
+                            <Authorized>
+
+                                <li>
+                                    <a href="/viewusers" data-radix-collection-item="">
+                                        DashBoard
+                                    </a>
+                                </li> |
+                                <li>
+                                    <a style="cursor: pointer" @onclick="Logout">
+                                        Logout
+                                    </a>
+                                </li> |
+                            </Authorized>
+
+                        </AuthorizeView>
+
+                        <li>
+                            <a href="#" data-radix-collection-item="">
+                                Contact
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <div class="absolute left-0 top-full flex justify-center"></div>
+            </nav>
+        </div>
+    </header>
+    <AuthorizeView Policy="Role">
+        <Authorized>
+
+  <div class="flex flex-col">
+
+                <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6" style="margin-top:120px">
+                    <div class="flex items-center">
+        <h1 class="font-semibold text-lg md:text-2xl">Users</h1>
+        <div class="ml-auto flex gap-2">
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 shrink-0"
+            type="button"
+            id="radix-:rq:"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            data-state="closed"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="w-4 h-4 mr-2"
+            >
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+            </svg>
+            Filters
+          </button>
+          <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 shrink-0">
+            Add User
+          </button>
+        </div>
+      </div>
+      <div class="border shadow-sm rounded-lg">
+        <div class="relative w-full overflow-auto">
+          <table class="w-full caption-bottom text-sm">
+            <thead class="[&amp;_tr]:border-b">
+              <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
+                  Name
+                </th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
+                  Email
+                </th>
+                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
+                  Role
+                </th>
+                                <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">
+                                    Phone
+                                </th>
+                <th class="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="[&amp;_tr:last-child]:border-0">
+             
+                            @if(users == null)
+                            {
+                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium">Loading...</td>
+                                    <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">Loading...</td>
+                                    <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">Loading...</td>
+                                    <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">Loading...</td>
+                                    <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 text-right">
+                                        <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 width="24"
+                                                 height="24"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="currentColor"
+                                                 stroke-width="2"
+                                                 stroke-linecap="round"
+                                                 stroke-linejoin="round"
+                                                 class="h-4 w-4">
+                                                <path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5"></path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                                <path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44Z"></path>
+                                            </svg>
+                                            <span class="sr-only">Edit</span>
+                                        </button>
+                                        <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 width="24"
+                                                 height="24"
+                                                 viewBox="0 0 24 24"
+                                                 fill="none"
+                                                 stroke="currentColor"
+                                                 stroke-width="2"
+                                                 stroke-linecap="round"
+                                                 stroke-linejoin="round"
+                                                 class="h-4 w-4">
+                                                <path d="M3 6h18"></path>
+                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                            </svg>
+                                            <span class="sr-only">Delete</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            else 
+                            {
+                                foreach(var item in users)
+                                {
+                                    
+                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 font-medium">@item.FirstName @item.LastName</td>
+                <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">@item.Email</td>
+                <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">@item.Role</td>
+                <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">@item.PhoneNumber</td>
+                <td class="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 text-right">
+                  <button @onclick="() => Edit(item.Id)" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="h-4 w-4"
+                    >
+                      <path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2h-5.5"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <path d="M10.42 12.61a2.1 2.1 0 1 1 2.97 2.97L7.95 21 4 22l.99-3.95 5.43-5.44Z"></path>
+                    </svg>
+                    <span class="sr-only" >Edit</span>
+                  </button>
+                   <button @onclick="() => Delete(item.Id)" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-10 w-10">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="h-4 w-4"
+                    >
+                      <path d="M3 6h18"></path>
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                    </svg>
+                    <span class="sr-only"  >Delete</span>
+                  </button>
+                </td>
+              </tr>
+                                }
+                            }
+                           
+                          
+             
+            </tbody>
+          </table>
+        </div>
+      </div>
+     
+    </main>
+  </div>
+@if(user == null){
+  
+}
+else
+{
+    
+    <EditPage @ref="editPage" UserToEdit="user" />
+}
+        </Authorized>
+        <NotAuthorized>
+            Sorry your are not authorized to view this
+        </NotAuthorized>
+
+    </AuthorizeView>
+</div>
+
+
+
+@code {
+    private EditPage? editPage = new EditPage();
+    private List<UserModel> users = new List<UserModel>();
+    private UserModel? user;
+    private string? email;
+    protected override async Task OnInitializedAsync()
+    {
+        email = await lStorage.GetItemAsStringAsync("email");
+        if (email != null)
+            email = email!.Trim('"');
+        var response = await Http.GetFromJsonAsync<List<UserModel>>("api/Account/user");
+
+
+        if (response != null)
+        {
+
+            users = response;
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var response = await Http.GetFromJsonAsync<List<UserModel>>("api/Account/user");
+
+
+            if (response != null)
+            {
+
+                users = response;
+            }
+        }
+    }
+
+    private async Task Delete(int Id)
+    {
+
+        var response = await Http.DeleteAsync($"api/Account/Delete/{Id}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var usersList = JsonConvert.DeserializeObject<List<UserModel>>(content);
+            if (usersList != null)
+            {
+                users = usersList;
+            }
+        }
+        else
+        {
+            // Handle error response
+        }
+
+
+
+    }
+    private async Task Edit(int userId)
+    {
+        
+            
+        user = users.FirstOrDefault(u => u.Id == userId)!;
+        
+     
+       
+            if (user != null && editPage != null)
+            {
+                editPage.ShowModal();
+                editPage.UserToEdit = user;
+            }
+            else
+            {
+               
+            }
+        
+       
+    }
+    private async void Logout()
+    {
+        await lStorage.RemoveItemAsync("email");
+        await Authprov.GetAuthenticationStateAsync();
+        navMag.NavigateTo("/login");
+    }
+
+}

@@ -1,0 +1,157 @@
+﻿@page "/edit"
+@using Price_Evaluator.Shared
+@using Newtonsoft.Json
+@inject HttpClient Http
+@inject IJSRuntime JSRuntime
+
+
+<style scoped>
+    .modal {
+        display: none; /* Hidden by default */
+        
+    }
+
+        .modal.show {
+            display: flex; /* Show the modal */
+            display: block; /* Show the modal */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            /*  left: 0; */
+            top: 100px;
+            width: 550px; /* Full width */
+            height: 550px; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: #9da2a2; /* Black w/ opacity */
+            /* Center the modal content */
+            display: flex;
+            border-radius: 20px;
+            margin-left: 30%;
+            align-items: center;
+            justify-content: center;
+        }
+
+
+        
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Inter', sans-serif;
+        --font-sans: 'Inter';
+    }
+</style>
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        --font-sans: 'Inter';
+    }
+</style>
+<div class="@modalClass">
+    <div class="w-[480px] max-w-full">
+        <div class="flex items-center justify-between">
+            <div>Edit Profile</div>
+            
+        </div>
+        <div class="space-y-5">
+            
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                       for="name">
+                    First Name
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       id="name" @bind-value ="@UserToEdit!.FirstName"
+                       placeholder="firstname"/>
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                       for="email">
+                    LastName
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       id="email"
+                       type="email"
+                       @bind-value="UserToEdit.LastName"
+                       placeholder="m@example.com" />
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                       for="name">
+                    Email
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       id="name" @bind-value="@UserToEdit!.Email"
+                       placeholder="firstname" />
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                       for="email">
+                    Phone Number
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       id="email"
+                       type="email"
+                       @bind-value="UserToEdit.PhoneNumber"
+                       placeholder="m@example.com" />
+            </div>
+            <div class="space-y-2">
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                       for="name">
+                    Role
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       id="name" @bind-value="@UserToEdit!.Role"
+                       placeholder="firstname" />
+            </div>
+            
+        </div>
+        <div class="flex justify-end gap-2">
+            <button @onclick="CloseModal" class="inline-flex top-50 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2">
+                Cancel
+            </button>
+            <button @onclick="SaveChanges" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+                    type="submit">
+                Save changes
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter] 
+    public UserModel? UserToEdit { get; set; }
+    private string modalClass => IsOpen ? "modal show" : "modal";
+    private bool IsOpen { get; set; }
+
+
+
+
+    private async Task SaveChanges()
+    {
+        if(UserToEdit != null)
+        {
+            
+        var response = await Http.PutAsJsonAsync($"api/Account/edit/{UserToEdit.Id}", UserToEdit);
+        if (response.IsSuccessStatusCode)
+        {
+            
+                await JSRuntime.InvokeVoidAsync("refreshPage");
+                CloseModal();
+        }
+        else
+        {
+            // Handle error
+        }
+        }
+    }
+
+    public void ShowModal()
+    {
+        IsOpen = true;
+    }
+
+    public void CloseModal()
+    {
+        
+        IsOpen = false;
+    }
+}

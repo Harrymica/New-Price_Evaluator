@@ -1,0 +1,110 @@
+﻿@page "/login"
+@using Price_Evaluator.Shared
+@inject IJSRuntime Jsruntime
+@inject NavigationManager navMag
+@inject HttpClient client
+
+@inject ILocalStorageService lStorage
+@inject AuthenticationStateProvider Authprov
+
+
+
+<style scoped>
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Inter', sans-serif;
+        --font-sans: 'Inter';
+    }
+</style>
+<style scoped>
+    body {
+        font-family: 'Inter', sans-serif;
+        --font-sans: 'Inter';
+    }
+</style>
+<EditForm Model="_login" OnValidSubmit="Submit">
+
+<div class="flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-900">
+    <div class="mx-auto w-full max-w-md rounded-lg bg-white p-8 shadow-lg dark:bg-gray-800">
+        <div class="space-y-6">
+            <div class="space-y-2 text-center">
+                <h1 class="text-3xl font-bold">Welcome Back</h1>
+                <p class="text-gray-500 dark:text-gray-400">Enter your email and password to sign in to your account. or 
+
+                </p>
+                    <div class="text-center">
+                        
+                        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                            dont have an account?
+                            <a class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-500 dark:hover:text-indigo-400"
+                               href="/registerpage">
+                                Sign Up
+                            </a>
+                        </p>
+                    </div>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="email" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Email
+                    </label>
+                    <input id="email" @bind-value="_login.Email"
+                           placeholder="name@example.com"
+                           class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-dark dark:placeholder-gray-400"
+                           type="email" />
+                </div>
+                <div>
+                    <label for="password" class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Password
+                    </label>
+                    <input id="password" @bind-value="_login.Password"
+                           placeholder="••••••••"
+                           class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-grey-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-dark dark:placeholder-gray-400"
+                           type="password" />
+                </div>
+                <button  type="submit"
+                        class="inline-flex w-full items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    Login
+                </button>
+            </div>
+            <div class="text-center text-sm text-gray-500 dark:text-gray-400">
+                <a href="/adminlogin" class="font-medium text-blue-500 hover:underline dark:text-blue-400">
+                    AdminLogin
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</EditForm>
+
+@code {
+
+     private Login _login = new Login();
+
+    private string errormsg = "Wrong Password or email";
+
+
+
+
+    private async Task Submit()
+    {
+
+        if (_login.Email != null && _login.Password != null)
+        {
+            var user = await client.PostAsJsonAsync("api/Account/login", _login);
+            if (user.IsSuccessStatusCode)
+            {
+                await lStorage.SetItemAsync<string>("email", _login.Email);
+                await Authprov.GetAuthenticationStateAsync();
+                navMag.NavigateTo("/");
+
+            }
+            else
+            {
+                
+                await Jsruntime.InvokeAsync<object>("Alert", errormsg);
+
+            }
+        }
+    }
+    
+}

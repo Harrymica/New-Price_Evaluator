@@ -1,0 +1,117 @@
+﻿@page "/index"
+@layout Layout
+@using Newtonsoft.Json
+@using Price_Evaluator.Shared
+@inject IProductClientServices products
+@implements IDisposable 
+
+<PageTitle>Index</PageTitle>
+
+
+<div class="Body">
+
+      <div class="container">
+        <div class="header">
+    <div class="search">
+
+    <input type="search" placeholder="search for any products..." @bind-value="products.Search" class="form-control"/>
+    
+    
+                
+     <button class="my-btn" style="text-align:center; align-content:center" @onclick="Get">Search</button>
+    
+               
+    </div>
+   
+         @*  <span class="text">  search for your deseriable products </span> *@
+   
+
+    </div>
+      
+        <div class="httpContent"> 
+        @if (products.result == null || products.result.Count < 0)
+        {
+              <p>Search for a Product</p>  
+        }
+        else
+        {
+
+            @foreach (var item in products.result)
+            {
+
+         <div class="httpItems">
+              <a href="@item.link">
+                 <h4>@item.shop.ToUpper()</h4>
+                        
+                <img src="@item.img" class="http_imgs" alt="..." style="image-resolution:300dpi"/>
+                <h5>@item.title</h5>
+                <h5>@item.price</h5>
+                <h5>@item.shipping</h5>
+             </a>
+         </div> 
+            }
+    
+   
+
+        }
+            </div> 
+
+       </div>
+      <div class="content">
+    <div class="items">
+       
+        <img src="images/electronics2.png" class="imgs" />
+
+    </div>
+    <div class="items">
+
+        <img src="images/Shoes5.png" class="imgs" />
+
+    </div>
+</div>
+     <div class="lastContent">
+    <div class="lastitems" >
+
+        <div class="lastimgs" data-aos="fade-left">
+        <p>With Great Power Comes Great Responsibilities</p>
+             </div>
+      
+
+    </div>
+    <div class="lastitems2" data-aos="fade-right">
+        <div class="lastimgs2">
+            <p>With Great Power Comes Great Responsibilities</p>
+        </div>
+       
+        
+    </div>
+    <div class="lastitems" data-aos="fade-left">
+        <div class="lastimgs3">
+        <p>With Great Power Comes Great Responsibilities</p>
+
+        </div>
+      
+    </div>
+</div>
+</div>
+
+@code {
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        
+         products.ProductChanged += StateHasChanged;
+    }
+    public async Task Get()
+    {
+        await products.GetProduct();
+    }
+   
+
+    public void Dispose()
+     
+    {
+        products.ProductChanged -= StateHasChanged;
+    }
+}

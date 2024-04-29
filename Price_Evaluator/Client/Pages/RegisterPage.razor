@@ -1,0 +1,132 @@
+﻿@page "/registerpage"
+@using Price_Evaluator.Shared
+@inject HttpClient client
+@inject NavigationManager navMag
+
+
+
+<style scoped>
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Inter', sans-serif;
+        --font-sans: 'Inter';
+    }
+</style>
+<style scoped>
+    body {
+        font-family: 'Inter', sans-serif;
+        --font-sans: 'Inter';
+    }
+</style>
+<EditForm Model="user" OnValidSubmit="Submit">
+
+<div class="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12 dark:bg-gray-950">
+    <div class="w-full max-w-md space-y-6">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-50">Create an account</h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                Already have an account?
+                <a class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-500 dark:hover:text-indigo-400"
+                   href="/login">
+                    Sign in
+                </a>
+            </p>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                       for="name">
+                    First Name
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       id="name"
+                       placeholder="John Doe"
+                       required=""
+                       type="text" @bind-value="user.FirstName"/>
+                    
+            </div>
+            <div>
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                       for="name">
+                    Last Name
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       id="name"
+                       placeholder="John Doe"
+                       required=""
+                       type="text" @bind-value="user.LastName" />
+                    
+            </div>
+                <div>
+                    <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                           for="contact">
+                        Contact
+                    </label>
+                    <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    id="email"
+                    placeholder="XXX999XXXX"
+                    required=""
+                    type="number"
+                    @bind-value="user.PhoneNumber"/>
+                   @*  <InputText type="text" @bind-Value="user.PhoneNumber" placeholder="Email" class="form-control" required></InputText>
+                    <ValidationMessage For="@(() => user.PhoneNumber)" /> *@
+                </div>
+            <div>
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                       for="email">
+                    Email address
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       id="email"
+                       placeholder="name@example.com"
+                       required=""
+                       type="email" 
+                       @bind-value="user.Email"/>
+                  
+            </div>
+            <div>
+                <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                       for="password">
+                    Password
+                </label>
+                <input class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                       id="password"
+                       placeholder="••••••••"
+                       required=""
+                       type="password" 
+                       @bind-value="user.Password"/>
+                    
+            </div>
+                <button class ="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+                    type="submit" @onclick="Submit">
+                Sign up
+            </button>
+           
+        </div>
+    </div>
+</div>
+
+</EditForm>
+@code {
+    private UserModel user = new UserModel();
+
+    public async Task Submit()
+    {
+
+        user.Role = "User";
+        var response = await client.PostAsJsonAsync("api/Account/register", user);
+
+        if (response.IsSuccessStatusCode)
+        {
+
+            navMag.NavigateTo("/login");
+
+        }
+        else
+        {
+            navMag.NavigateTo("/registerPage");
+
+        }
+
+
+    }
+}

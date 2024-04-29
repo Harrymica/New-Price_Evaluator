@@ -1,0 +1,275 @@
+﻿* {
+    list-style: none;
+    text-decoration: none;
+    color:black;
+
+    
+   
+}
+.Body {
+    background-color: #9da2a2;
+}
+
+.container {
+    margin-top: 0px;
+   
+}
+
+.httpContent {
+    display: grid;
+    position: relative;
+    grid-template-columns: repeat(4, 200px);
+    grid-template-rows: repeat(4, 200px, 20px);
+    place-content: center;
+    top: 550px;
+    gap: 100px;
+    height: 100%;
+    margin: 0 10px 0 10px;
+    font-family: 'Microsoft Himalaya';
+}
+.httpItems {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.http_imgs {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+    /*image-resolution: from-image;*/
+    image-resolution: 1080dpi snap;
+    /*filter: brightness(80%) contrast(120%);*/
+    /*transition: filter 300ms;*/
+}
+
+.content {
+    display: grid;
+    position: relative;
+    grid-template-columns: repeat(2, 50%);
+    grid-template-rows: repeat(2, 50%);
+    place-content: center;
+    top: 550px;
+    gap: 10px;
+    height: 100%;
+    margin: 0 10px 0 10px;
+    font-family: 'Microsoft Himalaya';
+}
+.items {
+    width: 100%;
+    margin-top: 200px;
+    
+}
+.imgs {
+    width: 100%;
+    height: 290px;
+    border-radius: 10px;
+}
+
+.header {
+    background-image: url(./images/Electronics3.png);
+    background-position: top;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: absolute;
+    height: calc(100vh - 80px);
+    left: 0;
+    width: 100%;
+    justify-content: center;
+}
+
+.lastContent {
+    display: grid;
+    position: relative;
+    grid-template-columns: repeat(3, 280px);
+    grid-template-rows: repeat(3, 280px);
+    place-content: center;
+    top: 550px;
+    gap: 20px;
+    height: 100%;
+    margin: 0 10px 0 10px;
+    font-family: 'Microsoft Himalaya';
+}
+    .lastitems {
+        width: 100%;
+        border-radius: 10px;
+    }
+.lastimgs {
+
+    position:relative;
+    background-image: url(./images/man.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-top: 20px;
+    width: 100%;
+    height: 280px;
+    border-radius: 10px;
+}
+.lastimgs2 {
+    position: relative;
+    background-image: url(./images/reformed.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-top: 20px;
+    width: 100%;
+    height: 280px;
+    border-radius: 10px;
+}
+.lastimgs3 {
+    position: relative;
+    background-image: url(./images/rformed.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-top: 20px;
+    width: 100%;
+    height: 280px;
+     border-radius: 10px;
+}
+ .lastimgs > p {
+       position:absolute;
+       margin-left:10px;
+       font-size:25px;
+       color:white;
+       bottom:0;
+
+   }
+.lastimgs2 > p {
+    position: absolute;
+    margin-left: 10px;
+    font-size: 25px;
+    color: white;
+    bottom: 0;
+}
+.lastimgs3 > p {
+    position: absolute;
+    margin-left: 10px;
+    font-size: 25px;
+    color: white;
+    bottom: 0;
+}
+
+.header > span {
+        margin-left: 290px;
+        
+        font-size: 40px;
+        color: white;
+       
+    }
+input {
+    width: 500px;
+}
+.search {
+    display: flex;
+    line-height: 50px;
+    margin-top: 150px;
+    justify-content: center;
+}
+.search > input {
+    display:flex;
+
+}
+.my-btn {
+    margin-left: 5px;
+    font-size: 30px;
+    color: white;
+    line-height: 40px;
+    align-self: center;
+    align-content: center;
+    text-align: center;
+    background-color: transparent;
+    border: 2px solid #03680b;
+    border-radius: 15px;
+    height: 40px;
+    width: 150px;
+  
+}
+    .my-btn:hover {
+        transform: scale3d(10px 10px 10px);
+        background-color: #03680b;
+    }
+    .my-btn a {
+        color: white;
+    }
+    
+    .search > input{
+    place-content:center;
+}
+    .search > span {
+        margin-left: 5px;
+        font-size: 50px;
+        color: white;
+        line-height: 40px;
+        align-self: center;
+        align-content: center;
+        text-align: center;
+    }
+
+@media (max-width: 800px){
+
+    .header > span {
+        margin-left: 5px;
+        font-size: 20px;
+        color: white;
+        
+    }
+    .my-btn {
+        width:90px;
+        font-size:20px;
+    }
+    .search > span {
+        margin-left: 30px;
+        display:none;
+    }
+    .httpContent {
+        display: grid;
+        position: relative;
+        grid-template-columns: repeat(2, 150px);
+        grid-template-rows: repeat(2, 150px, 20px);
+        place-content: center;
+        top: 400px;
+        gap: 50px;
+        height: 100%;
+        margin: 0 10px 0 10px;
+        font-family: 'Microsoft Himalaya';
+    }
+    input {
+        width: 200px;
+    }
+    .header {
+        background-image: url(./images/Electronics1.png);
+        background-position: top;
+        background-size: cover;
+        background-repeat: no-repeat;
+        position: absolute;
+        height: calc(60vh - 80px);
+        left: 0;
+        width: 100%;
+        justify-content: center;
+    }
+    .lastContent {
+        display: grid;
+        position: relative;
+        grid-template-columns: repeat(1, 300px);
+        grid-template-rows: repeat(1, 300px);
+        place-content: center;
+        top: 420px;
+        gap: 20px;
+        height: 100%;
+        margin: 0 10px 0 10px;
+        font-family: 'Microsoft Himalaya';
+    }
+    .content {
+        display: grid;
+        position: relative;
+        grid-template-columns: repeat(2, 50%);
+        grid-template-rows: repeat(2, 50%);
+        place-content: center;
+        top: 400px;
+        gap: 10px;
+        height: 100%;
+        margin: 0 10px 0 10px;
+        font-family: 'Microsoft Himalaya';
+    }
+    .imgs {
+        height:200px;
+    }
+    }

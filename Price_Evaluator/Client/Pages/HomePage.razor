@@ -1,0 +1,365 @@
+﻿@page "/"
+@using Price_Evaluator.Shared
+@inject IProductClientServices products
+@implements IDisposable
+@inject ILocalStorageService lStorage
+@inject ISyncLocalStorageService storage
+@inject AuthenticationStateProvider Authprov
+@inject NavigationManager navMag
+@inject HttpClient Http
+@layout Layout
+
+
+<style scoped>
+
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Cormorant Garamond', serif;
+        --font-serif: 'Cormorant Garamond';
+    }
+</style>
+
+<style scoped>
+    body {
+        font-family: 'Archivo', sans-serif;
+        --font-sans: 'Archivo';
+    }
+
+   
+    header {
+        top:50px;
+        position:fixed;
+        z-index:1;
+        width:100%;
+        box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+    }
+</style>
+
+<div class="flex flex-col min-h-screen">
+
+
+   
+    <header class="bg-white shadow-lg dark:bg-gray-900">
+        <div class="container mx-auto px-4 py-4 md:py-6 flex flex-wrap items-center justify-between">
+            <a class="flex items-center gap-2" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     width="24"
+                     height="24"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     class="h-6 w-6 text-primary">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <span class="text-lg font-semibold dark:text-dark">Product Evaluator</span>
+            </a>
+            <div class="flex-1 max-w-md md:order-2">
+                <div class="relative flex items-center">
+                    
+                    @* this binds the serach to the input field *@
+                    <input class="flex-1 h-10 px-3 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-l-md border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-dark"
+                           placeholder="Search products..."
+                           type="search" @bind-value="products.Search" />
+
+                    <button class="btn btn-dark rounded-l-none rounded-r-md" @onclick="Get">Search</button>
+                </div>
+            </div>
+            <nav aria-label="Main"
+                 data-orientation="horizontal"
+                 dir="ltr"
+                 class="relative z-10 flex max-w-max flex-1 items-center justify-center md:order-1">
+                <button class="md:hidden" @onclick="ToggleMenu">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+                <ul data-orientation="horizontal"
+                    class="group flex flex-1 list-none items-center justify-center space-x-1 @(isMenuOpen ? "block" : "hidden") md:flex"
+                    dir="ltr">
+                    <li>
+                        <a href="#" data-radix-collection-item="">
+                            Home
+                        </a>
+                    </li> |
+                    <AuthorizeView>
+                        <NotAuthorized>
+                            <li>
+                                <a href="/login" data-radix-collection-item="">
+                                    Login
+                                </a>
+                            </li> |
+                            <li>
+                                <a href="registerpage" data-radix-collection-item="">
+                                    Register
+                                </a>
+                            </li> |
+                        </NotAuthorized>
+                        <Authorized>
+                            <li>
+                                <a href="#" data-radix-collection-item="">
+                                    @email
+                                </a>
+                            </li> |
+                            <li>
+                                <a href="/cart" data-radix-collection-item="">
+                                    cart
+                                </a>
+                            </li> |
+                            <li>
+                                <a style="cursor: pointer" @onclick="Logout">
+                                    Logout
+                                </a>
+                            </li> |
+                        </Authorized>
+                    </AuthorizeView>
+                    <AuthorizeView Policy="Role">
+                        <NotAuthorized>
+                            <li>
+                                <a href="/adminlogin" data-radix-collection-item="">
+                                    Admin Login
+                                </a>
+                            </li> |
+                        </NotAuthorized>
+                        <Authorized>
+                            <li>
+                                <a href="/viewusers" data-radix-collection-item="">
+                                    DashBoard
+                                </a>
+                            </li> |
+                           
+                        </Authorized>
+                    </AuthorizeView>
+                    <li>
+                        <a href="#" data-radix-collection-item="">
+                            Contact
+                        </a>
+                    </li>
+                   
+
+                   
+                   
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-1">
+        <section class="bg-gray-100 dark:bg-gray-900">
+            <div class="container mx-auto px-4 py-12 md:py-20 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                        Discover the Best Products for You and best affordable Prices
+                    </h1>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400">
+                        Browse our curated selection of high-quality products for your home and lifestyle.
+                    </p>
+                    <div class="mt-6">
+                        <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-11 rounded-md px-8 bg-primary text-white hover:bg-primary-dark">
+                            Shop Now
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <img src="./images/pngwing.com.png"
+                         alt="Hero Product"
+                         width="600"
+                         height="600"
+                         class="w-full h-auto rounded-lg object-cover"
+                         style="aspect-ratio: 600 / 600; object-fit: cover;" />
+                </div>
+            </div>
+        </section>
+        <section class="py-12 md:py-20">
+            <div class="container mx-auto px-4">
+                <div class="httpContent">
+               
+                    @if (root == null || root.Count < 0)
+                    {
+                        <div class="mb-8 text-center">
+                            <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Featured Products</h2>
+                            <p class="mt-2 text-gray-600 dark:text-gray-400">Searched products appear here</p>
+                        </div>
+                    }
+                    else
+                    {
+
+                        @foreach (var item in root)
+                        {
+
+                            <div class="httpItems">
+                                <a href="@item.link">
+                                    <h4>@item.shop.ToUpper()</h4>
+
+                                    <img src="@item.img" class="http_imgs" alt="..." style="image-resolution:300dpi" />
+                                    <h5>@item.title</h5>
+                                    <h5>@item.price</h5>
+                                    <h5>@item.shipping</h5>
+                                </a>
+                                <button 
+                                    type="submit"
+                                    @onclick="() => AddCart(item)"
+                                    class="inline-flex items-center justify-center whitespace-nowrap text-lg font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-11 rounded-md px-8 bg-primary text-white hover:bg-primary-dark">
+                                   Cart
+                                </button>
+                               
+                            </div>
+                        }
+
+
+
+                    }
+                    </div>
+
+
+
+               
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+            </div>
+        </section>
+        <section class="bg-gray-100 dark:bg-gray-900 py-12 md:py-20">
+            <div class="container mx-auto px-4">
+                <div class="mb-8 text-center">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Shop by Category</h2>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">Explore our wide range of product categories.</p>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
+            </div>
+        </section>
+        <section class="py-12 md:py-20">
+            <div class="container mx-auto px-4">
+                <div class="mb-8 text-center">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">What Our Customers Say</h2>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">Hear from our satisfied customers.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">About</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#">Our Story</a>
+                        </li>
+                        <li>
+                            <a href="#">Our Team</a>
+                        </li>
+                        <li>
+                            <a href="#">Careers</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Shop</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#">All Products</a>
+                        </li>
+                        <li>
+                            <a href="#">Featured Products</a>
+                        </li>
+                        <li>
+                            <a href="#">Sale Items</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Customer Service</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#">Contact Us</a>
+                        </li>
+                        <li>
+                            <a href="#">Returns &amp; Exchanges</a>
+                        </li>
+                        <li>
+                            <a href="#">Shipping &amp; Delivery</a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#">Privacy Policy</a>
+                        </li>
+                        <li>
+                            <a href="#">Terms of Service</a>
+                        </li>
+                        <li>
+                            <a href="#">Cookie Policy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 text-center text-gray-400">© @DateTime.Now.Year Product Evaluator. All rights reserved.</div>
+        </div>
+    </footer>
+</div>
+
+@code {
+    private bool isMenuOpen = false;
+    private List<Root> root = new List<Root>();
+    private Cart cart = new Cart();
+    private string? email;
+    private void ToggleMenu()
+    {
+        isMenuOpen = !isMenuOpen;
+    }
+    protected override  async Task OnInitializedAsync()
+    {
+
+        email = await lStorage.GetItemAsStringAsync("email");
+        if (email != null)
+            email = email!.Trim('"');
+        products.ProductChanged += StateHasChanged;
+    }
+    public async Task Get()
+    {
+        var result = await products.GetProduct();
+        root = result;
+    }
+    private async Task AddCart(Root root)
+    {
+        if(email != null)
+        {
+
+            var userId = await Http.GetFromJsonAsync<UserModel>($"api/Account/email/{email}");
+            
+
+            cart.UserId = userId!.Id;
+            cart.Name = root.title ;
+            cart.Price = root.price;
+            cart.Url = root.link;
+            cart.ImageUrl = root.img;
+            cart.Shop = root.shop;
+
+            await products.AddCart(cart);
+        }
+        else
+        {
+            navMag.NavigateTo("/login");
+        }
+
+    }
+    private async void Logout()
+    {
+        await lStorage.RemoveItemAsync("email");
+        await Authprov.GetAuthenticationStateAsync();
+        navMag.NavigateTo("/login");
+    }
+   
+    public void Dispose()
+
+    {
+        products.ProductChanged -= StateHasChanged;
+    }
+}
